@@ -3,6 +3,8 @@ version: '2'
 volumes:
   postgres_data: {}
   postgres_backup: {}
+  media: {}
+  static: {}
 
 services:
   postgres:
@@ -17,6 +19,9 @@ services:
       context: .
       dockerfile: ./compose/django/Dockerfile
     user: django
+    volumes:
+      - media:/app/media
+      - static:/app/static
     depends_on:
       - postgres
       - redis
@@ -32,6 +37,8 @@ services:
 {% endif %}
     ports:
       - "0.0.0.0:80:80"
+    volumes_from:
+      - django
 {% if cookiecutter.use_lets_encrypt == 'y' %}
     environment:
       - MY_DOMAIN_NAME={{ cookiecutter.domain_name }}
