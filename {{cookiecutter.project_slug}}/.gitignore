@@ -68,7 +68,10 @@ node_modules/
 .env
 
 # User-uploaded media
-{{ cookiecutter.project_slug }}/media/
+/media/
+
+# Sqlite3 db
+db.sqlite3
 
 {% if cookiecutter.use_mailhog == 'y' and cookiecutter.use_docker == 'n' %}
 # MailHog binary
