@@ -1,5 +1,4 @@
-echo sleep 5
-sleep 5
+#!/usr/bin/env bash
 
 echo build starting nginx config
 
@@ -40,9 +39,6 @@ do
     sleep 2
 done
 
-# This is added so that when the certificate is being renewed or is already in place, nginx waits for everything to be good.
-sleep 15
-
 echo replacing ___my.example.com___/$MY_DOMAIN_NAME
 
 
@@ -59,4 +55,7 @@ sed -i "s/___NAMESERVER___/$NAMESERVER/g" /etc/nginx/nginx-secure.conf
 kill $(ps aux | grep 'nginx' | grep -v 'grep' | awk '{print $2}')
 cp /etc/nginx/nginx-secure.conf /etc/nginx/nginx.conf
 
+echo sleep 3
+sleep 3
+echo starting nginx
 nginx -g 'daemon off;'
