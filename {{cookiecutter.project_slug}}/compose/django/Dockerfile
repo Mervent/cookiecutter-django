@@ -13,7 +13,9 @@ RUN pip install -r /requirements/production.txt \
     && useradd -r -g django django
 
 COPY . /app
-RUN chown -R django /app
+RUN mkdir /app/media \
+    && mkdir /app/static \
+    && chown -R django /app
 
 COPY ./compose/django/gunicorn.sh /gunicorn.sh
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
