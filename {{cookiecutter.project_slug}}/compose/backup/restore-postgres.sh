@@ -45,4 +45,4 @@ createdb -h postgres -U $POSTGRES_USER django -O $POSTGRES_USER
 
 # restore the database
 echo "restoring database $POSTGRES_USER"
-bzip2 -d $BACKUPFILE | psql -h postgres -U $POSTGRES_USER django
+bzip2 -d -k -c $BACKUPFILE | psql -h postgres -U $POSTGRES_USER django

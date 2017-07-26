@@ -7,6 +7,6 @@ echo "creating media backup"
 echo "---------------"
 
 FILENAME=media_$(date +'%Y_%m_%dT%H_%M_%S').tar.bz2
-tar cjf /backups/$FILENAME /app/media
+tar cvjf /backups/$FILENAME -C /app/media .
 
 echo "successfully created backup $FILENAME"
