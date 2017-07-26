@@ -52,7 +52,7 @@ sed -i "s/___NAMESERVER___/$NAMESERVER/g" /etc/nginx/nginx-secure.conf
 
 
 #go!
-kill $(ps aux | grep 'nginx' | grep -v 'grep' | awk '{print $2}')
+nginx -s stop
 cp /etc/nginx/nginx-secure.conf /etc/nginx/nginx.conf
 
 echo sleep 3
