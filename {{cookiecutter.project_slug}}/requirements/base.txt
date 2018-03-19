@@ -1,60 +1,27 @@
-{% if cookiecutter.use_python3 == 'y' -%}
-# Wheel 0.25+ needed to install certain packages on CPython 3.5+
-# like Pillow and psycopg2
-# See http://bitly.com/wheel-building-fails-CPython-35
-# Verified bug on Python 3.5.1
-wheel==0.29.0
+pytz==2018.3  # https://github.com/stub42/pytz
+awesome-slugify==1.6.5  # https://github.com/dimka665/awesome-slugify
+Pillow==5.0.0  # https://github.com/python-pillow/Pillow
+{%- if cookiecutter.use_compressor == "y" %}
+rcssmin==1.0.6  # https://github.com/ndparker/rcssmin
 {%- endif %}
-
-# Bleeding edge Django
-django==1.10.5
-
-# Configuration
-django-environ==0.4.1
-{% if cookiecutter.use_whitenoise == 'y' -%}
-whitenoise==3.2.3
+argon2-cffi==18.1.0  # https://github.com/hynek/argon2_cffi
+{%- if cookiecutter.use_whitenoise == 'y' %}
+whitenoise==3.3.1  # https://github.com/evansd/whitenoise
 {%- endif %}
+redis>=2.10.5  # https://github.com/antirez/redis
 
-
-# Forms
-django-braces==1.10.0
-django-crispy-forms==1.6.1
-
-# Models
-django-model-utils==2.6.1
-
-# Images
-Pillow==4.0.0
-
-# For user registration, either via email or social
-# Well-built with regular release cycles!
-django-allauth==0.30.0
-
-{% if cookiecutter.windows == 'y' -%}
-# On Windows, you must download/install psycopg2 manually
-# from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psycopg
-{% else %}
-# Python-PostgreSQL Database Adapter
-psycopg2==2.6.2
+# Django
+# ------------------------------------------------------------------------------
+django==2.0.3  # pyup: < 2.1  # https://www.djangoproject.com/
+django-environ==0.4.4  # https://github.com/joke2k/django-environ
+django-model-utils==3.1.1  # https://github.com/jazzband/django-model-utils
+django-allauth==0.35.0  # https://github.com/pennersr/django-allauth
+django-crispy-forms==1.7.2  # https://github.com/django-crispy-forms/django-crispy-forms
+{%- if cookiecutter.use_compressor == "y" %}
+django-compressor==2.2  # https://github.com/django-compressor/django-compressor
 {%- endif %}
+django-redis==4.9.0  # https://github.com/niwinz/django-redis
 
-# Unicode slugification
-awesome-slugify==1.6.5
-
-# Time zones support
-pytz==2016.10
-
-# Redis support
-django-redis==4.7.0
-redis>=2.10.5
-
-{% if cookiecutter.use_celery == "y" %}
-celery==3.1.24
-{% endif %}
-
-{% if cookiecutter.use_compressor == "y" %}
-rcssmin==1.0.6 {% if cookiecutter.windows == 'y' %}--install-option="--without-c-extensions"{% endif %}
-django-compressor==2.1
-{% endif %}
-
-# Your custom requirements go here
+# Django REST Framework
+djangorestframework==3.7.7  # https://github.com/encode/django-rest-framework
+coreapi==2.3.3  # https://github.com/core-api/python-client

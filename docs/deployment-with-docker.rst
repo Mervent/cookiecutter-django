@@ -1,167 +1,139 @@
 Deployment with Docker
-=======================
+======================
 
-.. index:: Docker, deployment
+.. index:: deployment, docker, docker-compose, compose
+
 
 Prerequisites
 -------------
 
-* Docker (at least 1.10)
-* Docker Compose (at least 1.6)
+* Docker 1.10+.
+* Docker Compose 1.6+
 
-Understand the Compose Setup
---------------------------------
 
-Before you start, check out the `docker-compose.yml` file in the root of this project. This is where each component
-of this application gets its configuration from. Notice how it provides configuration for these services:
+Understanding the Docker Compose Setup
+--------------------------------------
 
-* `postgres` service that runs the database
-* `redis` for caching
-* `nginx` as reverse proxy
-* `django` is the Django project run by gunicorn
+Before you begin, check out the ``production.yml`` file in the root of this project. Keep note of how it provides configuration for the following services:
 
-If you chose the `use_celery` option, there are two more services:
+* ``django``: your application running behind ``Gunicorn``;
+* ``postgres``: PostgreSQL database with the application's relational data;
+* ``redis``: Redis instance for caching;
+* ``caddy``: Caddy web server with HTTPS on by default.
 
-* `celeryworker` which runs the celery worker process
-* `celerybeat` which runs the celery beat process
+Provided you have opted for Celery (via setting ``use_celery`` to ``y``) there are two more services:
 
-If you chose the `use_letsencrypt` option, you also have:
+* ``celeryworker`` running a Celery worker process;
+* ``celerybeat`` running a Celery beat process.
 
-* `certbot` which keeps your certs from letsencrypt up-to-date
 
-Populate .env With Your Environment Variables
+Configuring the Stack
+---------------------
+
+The majority of services above are configured through the use of environment variables. Just check out :ref:`envs` and you will know the drill.
+
+To obtain logs and information about crashes in a production setup, make sure that you have access to an external Sentry instance (e.g. by creating an account with `sentry.io`_), and set the ``DJANGO_SENTRY_DSN`` variable.
+
+You will probably also need to setup the Mail backend, for example by adding a `Mailgun`_ API key and a `Mailgun`_ sender domain, otherwise, the account creation view will crash and result in a 500 error when the backend attempts to send an email to the account owner.
+
+.. _sentry.io: https://sentry.io/welcome
+.. _Mailgun: https://mailgun.com
+
+
+Optional: Use AWS IAM Role for EC2 instance
+-------------------------------------------
+
+If you are deploying to AWS, you can use the IAM role to substitute AWS credentials, after which it's safe to remove the ``AWS_ACCESS_KEY_ID`` AND ``AWS_SECRET_ACCESS_KEY`` from ``.envs/.production/.django``. To do it, create an `IAM role`_ and `attach`_ it to the existing EC2 instance or create a new EC2 instance with that role. The role should assume, at minimum, the ``AmazonS3FullAccess`` permission.
+
+.. _IAM role: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html
+.. _attach: https://aws.amazon.com/blogs/security/easily-replace-or-attach-an-iam-role-to-an-existing-ec2-instance-by-using-the-ec2-console/
+
+
+HTTPS is On by Default
+----------------------
+
+SSL (Secure Sockets Layer) is a standard security technology for establishing an encrypted link between a server and a client, typically in this case, a web server (website) and a browser. Not having HTTPS means that malicious network users can sniff authentication credentials between your website and end users' browser.
+
+It is always better to deploy a site behind HTTPS and will become crucial as the web services extend to the IoT (Internet of Things). For this reason, we have set up a number of security defaults to help make your website secure:
+
+* If you are not using a subdomain of the domain name set in the project, then remember to put the your staging/production IP address in the ``DJANGO_ALLOWED_HOSTS`` environment variable (see :ref:`settings`) before you deploy your website. Failure to do this will mean you will not have access to your website through the HTTP protocol.
+
+* Access to the Django admin is set up by default to require HTTPS in production or once *live*.
+
+The Caddy web server used in the default configuration will get you a valid certificate from Lets Encrypt and update it automatically. All you need to do to enable this is to make sure that your DNS records are pointing to the server Caddy runs on.
+
+You can read more about this here at `Automatic HTTPS`_ in the Caddy docs.
+
+.. _Automatic HTTPS: https://caddyserver.com/docs/automatic-https
+
+
+(Optional) Postgres Data Volume Modifications
 ---------------------------------------------
 
-Some of these services rely on environment variables set by you. There is an `env.example` file in the
-root directory of this project as a starting point. Add your own variables to the file and rename it to `.env`. This
-file won't be tracked by git by default so you'll have to make sure to use some other mechanism to copy your secret if
-you are relying solely on git.
+Postgres is saving its database files to the ``postgres_data`` volume by default. Change that if you want something else and make sure to make backups since this is not done automatically.
 
-Optional: nginx-proxy Setup
----------------------------
 
-By default, the application is configured to listen on all interfaces on port 80. If you want to change that, open the
-`docker-compose.yml` file and replace `0.0.0.0` with your own ip.
+Building & Running Production Stack
+-----------------------------------
 
-If you are using `nginx-proxy`_ to run multiple application stacks on one host, remove the port setting entirely and add `VIRTUAL_HOST=example.com` to your env file. Here, replace example.com with the value you entered for `domain_name`.
+You will need to build the stack first. To do that, run::
 
-This pass all incoming requests on `nginx-proxy`_ to the nginx service your application is using.
-
-.. _nginx-proxy: https://github.com/jwilder/nginx-proxy
-
-Optional: Postgres Data Volume Modifications
----------------------------------------------
-
-Postgres is saving its database files to the `postgres_data` volume by default. Change that if you wan't
-something else and make sure to make backups since this is not done automatically.
-
-Optional: Certbot and Let's Encrypt Setup
-------------------------------------------
-
-If you chose `use_letsencrypt` and will be using certbot for https, you must do the following before running anything with docker-compose:
-
-Replace dhparam.pem.example with a generated dhparams.pem file before running anything with docker-compose. You can generate this on ubuntu or OS X by running the following in the project root:
-
-::
-
-    $ openssl dhparam -out /path/to/project/compose/nginx/dhparams.pem 2048
-
-If you would like to add additional subdomains to your certificate, you must add additional parameters to the certbot command in the `docker-compose.yml` file:
-
-Replace:
-
-::
-
-    command: bash -c "sleep 6 && certbot certonly -n --standalone -d {{ cookiecutter.domain_name }} --text --agree-tos --email mjsisley@relawgo.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
-
-With:
-
-::
-
-    command: bash -c "sleep 6 && certbot certonly -n --standalone -d {{ cookiecutter.domain_name }} -d www.{{ cookiecutter.domain_name }} -d etc.{{ cookiecutter.domain_name }} --text --agree-tos --email {{ cookiecutter.email }} --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
-
-Please be cognizant of Certbot/Letsencrypt certificate requests limits when getting this set up. The provide a test server that does not count against the limit while you are getting set up.
-
-The certbot certificates expire after 3 months.
-If you would like to set up autorenewal of your certificates, the following commands can be put into a bash script:
-
-::
-
-    #!/bin/bash
-    cd <project directory>
-    docker-compose run --rm --name certbot certbot bash -c "sleep 6 && certbot certonly --standalone -d {{ cookiecutter.domain_name }} --text --agree-tos --email {{ cookiecutter.email }} --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
-    docker exec pearl_nginx_1 nginx -s reload
-
-And then set a cronjob by running `crontab -e` and placing in it (period can be adjusted as desired)::
-
-    0 4 * * 1 /path/to/bashscript/renew_certbot.sh
-
-Run your app with docker-compose
---------------------------------
-
-To get started, pull your code from source control (don't forget the `.env` file) and change to your projects root
-directory.
-
-You'll need to build the stack first. To do that, run::
-
-    docker-compose build
+    docker-compose -f production.yml build
 
 Once this is ready, you can run it with::
 
-    docker-compose up
+    docker-compose -f production.yml up
 
 To run a migration, open up a second terminal and run::
 
-   docker-compose run django python manage.py migrate
+   docker-compose -f production.yml run --rm django python manage.py migrate
 
 To create a superuser, run::
 
-   docker-compose run django python manage.py createsuperuser
+   docker-compose -f production.yml run --rm django python manage.py createsuperuser
 
 If you need a shell, run::
 
-   docker-compose run django python manage.py shell
+   docker-compose -f production.yml run --rm django python manage.py shell
 
-To get an output of all running containers.
+To check the logs out, run::
 
-To check your logs, run::
-
-   docker-compose logs
+   docker-compose -f production.yml logs
 
 If you want to scale your application, run::
 
-   docker-compose scale django=4
-   docker-compose scale celeryworker=2
+   docker-compose -f production.yml scale django=4
+   docker-compose -f production.yml scale celeryworker=2
 
-.. warning:: Don't run the scale command on postgres, celerybeat, certbot, or nginx.
+.. warning:: don't try to scale ``postgres``, ``celerybeat``, or ``caddy``.
 
-If you have errors, you can always check your stack with `docker-compose`. Switch to your projects root directory and run::
+To see how your containers are doing run::
 
-    docker-compose ps
+    docker-compose -f production.yml ps
 
 
-Supervisor Example
+Example: Supervisor
 -------------------
 
-Once you are ready with your initial setup, you wan't to make sure that your application is run by a process manager to
+Once you are ready with your initial setup, you want to make sure that your application is run by a process manager to
 survive reboots and auto restarts in case of an error. You can use the process manager you are most familiar with. All
-it needs to do is to run `docker-compose up` in your projects root directory.
+it needs to do is to run ``docker-compose -f production.yml up`` in your projects root directory.
 
-If you are using `supervisor`, you can use this file as a starting point::
+If you are using ``supervisor``, you can use this file as a starting point::
 
     [program:{{cookiecutter.project_slug}}]
-    command=docker-compose up
+    command=docker-compose -f production.yml up
     directory=/path/to/{{cookiecutter.project_slug}}
     redirect_stderr=true
     autostart=true
     autorestart=true
     priority=10
 
-Place it in `/etc/supervisor/conf.d/{{cookiecutter.project_slug}}.conf` and run::
+Move it to ``/etc/supervisor/conf.d/{{cookiecutter.project_slug}}.conf`` and run::
 
     supervisorctl reread
     supervisorctl start {{cookiecutter.project_slug}}
 
-To get the status, run::
+For status check, run::
 
     supervisorctl status

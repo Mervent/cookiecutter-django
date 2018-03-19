@@ -1,87 +1,32 @@
 Project Generation Options
 ==========================
 
-project_name [project_name]:
-    Your human-readable project name, including any capitalization or spaces.
+project_name [My Awesome Project]:
+    Your project's human-readable name, capitals and spaces allowed.
 
-project_slug [project_name]:
-    The slug of your project, without dashes or spaces. Used to name your repo
+project_slug [my_awesome_project]:
+    Your project's slug without dashes or spaces. Used to name your repo
     and in other places where a Python-importable version of your project name
     is needed.
 
-author_name [Your Name]:
-    You! This goes into places like the LICENSE file.
+description [Behold My Awesome Project!]
+    Describes your project and gets used in places like ``README.rst`` and such.
 
-email [Your email]:
-    Your email address.
+author_name [Daniel Roy Greenfeld]:
+    This is you! The value goes into places like ``LICENSE`` and such.
 
-description [A short description of the project.]
-    Used in the generated README.rst and other places.
+email [daniel-roy-greenfeld@example.com]:
+    The email address you want to identify yourself in the project.
 
 domain_name [example.com]
-    Whatever domain name you plan to use for your project when it goes live.
+    The domain name you plan to use for your project once it goes live.
+    Note that it can be safely changed later on whenever you need to.
 
 version [0.1.0]
-    The starting version number for your project.
-
-timezone [UTC]
-    Used in the common settings file for the `TIME_ZONE` value.
-
-use_whitenoise [y]
-    Whether to use WhiteNoise_ for static file serving.
-
-use_celery [n]
-    Whether to use Celery_. This gives you the ability to use distributed task
-    queues in your project.
-
-use_mailhog [n]
-    Whether to use MailHog_. MailHog is a tool that simulates email receiving
-    for development purposes. It runs a simple SMTP server which catches
-    any message sent to it. Messages are displayed in a web interface which
-    runs at ``http://localhost:8025/`` You need to download the MailHog
-    executable for your operating system, see the 'Developing Locally' docs
-    for instructions.
-
-use_sentry_for_error_reporting [n]
-    Whether to use Sentry_ to log errors from your project.
-
-use_opbeat [n]
-    Whether to use Opbeat_ for preformance monitoring and code optimization.
-
-use_pycharm [n]
-    Adds support for developing in PyCharm_ with a preconfigured .idea directory.
-
-windows [n]
-    Whether you'll be developing on Windows.
-
-use_python3 [y]
-    By default, the Python code generated will be for Python 3.x. But if you
-    answer `n` here, it will be legacy Python 2.7 code.
-
-use_docker [y]
-    Whether to use Docker_, separating the app and database into separate
-    containers.
-
-use_heroku [n]
-    Add configuration to deploy the application to a Heroku_ instance.
-
-use_compressor [n]
-    Use `Django Compressor`_ to minify and combine rendered JavaScript and CSS
-    into cachable static resources.
-
-js_task_runner [1]
-    Select a JavaScript task runner. The choices are:
-
-    1. Gulp_
-    2. Grunt_
-    3. Webpack_
-    4. None
-
-use_lets_encrypt [n]
-    Use `Let's Encrypt`_ as the certificate authority for this project.
+    The version of the project at its inception.
 
 open_source_license [1]
-    Select a software license for the project. The choices are:
+    A software license for the project. The choices are:
 
     1. MIT_
     2. BSD_
@@ -89,23 +34,99 @@ open_source_license [1]
     4. `Apache Software License 2.0`_
     5. Not open source
 
-**NOTE:** *If you choose to use Docker, selecting a JavaScript task runner is
-not supported out of the box.*
+timezone [UTC]
+    The value to be used for the ``TIME_ZONE`` setting of the project.
 
-.. _WhiteNoise: https://github.com/evansd/whitenoise
-.. _Celery: https://github.com/celery/celery
-.. _MailHog: https://github.com/mailhog/MailHog
-.. _Sentry: https://github.com/getsentry/sentry
-.. _Opbeat: https://github.com/opbeat/opbeat_python
-.. _PyCharm: https://www.jetbrains.com/pycharm/
-.. _Docker: https://github.com/docker/docker
-.. _Heroku: https://github.com/heroku/heroku-buildpack-python
-.. _Django Compressor: https://github.com/django-compressor/django-compressor
-.. _Gulp: https://github.com/gulpjs/gulp
-.. _Grunt: https://github.com/gruntjs/grunt
-.. _Webpack: https://github.com/webpack/webpack
-.. _Let's Encrypt: https://github.com/certbot/certbot
+windows [n]
+    Indicates whether the project should be configured for development on Windows.
+
+use_pycharm [n]
+    Indicates whether the project should be configured for development with PyCharm_.
+
+use_docker [y]
+    Indicates whether the project should be configured to use Docker_ and `Docker Compose`_.
+
+postgresql_version [1]
+    Select a PostgreSQL_ version to use. The choices are:
+
+    1. 10.3
+    2. 10.2
+    3. 10.1
+    4. 9.6
+    5. 9.5
+    6. 9.4
+    7. 9.3
+
+js_task_runner [1]
+    Select a JavaScript task runner. The choices are:
+
+    1. Gulp_
+    2. Grunt_
+    3. None
+
+custom_bootstrap_compilation [n]
+    Indicates whether the project should support Bootstrap recompilation
+    via the selected JavaScript task runner's task. This can be useful
+    for real-time Bootstrap variable alteration.
+
+use_compressor [n]
+    Indicates whether the project should be configured to use `Django Compressor`_.
+
+use_celery [n]
+    Indicates whether the project should be configured to use Celery_.
+
+use_mailhog [n]
+    Indicates whether the project should be configured to use MailHog_.
+
+use_sentry_for_error_reporting [n]
+    Indicates whether the project should be configured to use Sentry_.
+
+use_opbeat [n]
+    Indicates whether the project should be configured to use Opbeat_.
+
+use_whitenoise [y]
+    Indicates whether the project should be configured to use WhiteNoise_.
+
+use_heroku [n]
+    Indicates whether the project should be configured so as to be deployable
+    to Heroku_.
+
+use_travisci [n]
+    Indicates whether the project should be configured to use `Travis CI`_.
+
+keep_local_envs_in_vcs [y]
+    Indicates whether the project's ``.envs/.local/`` should be kept in VCS
+    (comes in handy when working in teams where local environment reproducibility
+    is strongly encouraged).
+
+
 .. _MIT: https://opensource.org/licenses/MIT
 .. _BSD: https://opensource.org/licenses/BSD-3-Clause
 .. _GPLv3: https://www.gnu.org/licenses/gpl.html
 .. _Apache Software License 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
+.. _PyCharm: https://www.jetbrains.com/pycharm/
+
+.. _Docker: https://github.com/docker/docker
+.. _Docker Compose: https://docs.docker.com/compose/
+
+.. _PostgreSQL: https://www.postgresql.org/docs/
+
+.. _Gulp: https://github.com/gulpjs/gulp
+.. _Grunt: https://github.com/gruntjs/grunt
+
+.. _Django Compressor: https://github.com/django-compressor/django-compressor
+
+.. _Celery: https://github.com/celery/celery
+
+.. _MailHog: https://github.com/mailhog/MailHog
+
+.. _Sentry: https://github.com/getsentry/sentry
+
+.. _Opbeat: https://github.com/opbeat/opbeat_python
+
+.. _WhiteNoise: https://github.com/evansd/whitenoise
+
+.. _Heroku: https://github.com/heroku/heroku-buildpack-python
+
+.. _Travis CI: https://travis-ci.org/

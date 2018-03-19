@@ -55,23 +55,7 @@ Moved to `Live reloading and SASS compilation`_.
 
 .. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
 
-{% if cookiecutter.use_celery == "y" %}
 
-Celery
-^^^^^^
-
-This app comes with Celery.
-
-To run a celery worker:
-
-.. code-block:: bash
-
-    cd {{cookiecutter.project_slug}}
-    celery -A {{cookiecutter.project_slug}}.taskapp worker -l info
-
-Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
-
-{% endif %}
 {% if cookiecutter.use_mailhog == "y" %}
 
 Email Server
@@ -79,16 +63,12 @@ Email Server
 {% if cookiecutter.use_docker == 'y' %}
 In development, it is often nice to be able to see emails that are being sent from your application. For that reason local SMTP server `MailHog`_ with a web interface is available as docker container.
 
-.. _mailhog: https://github.com/mailhog/MailHog
-
 Container mailhog will start automatically when you will run all docker containers.
 Please check `cookiecutter-django Docker documentation`_ for more details how to start all containers.
 
 With MailHog running, to view messages that are sent by your application, open your browser and go to ``http://127.0.0.1:8025``
 {% else %}
 In development, it is often nice to be able to see emails that are being sent from your application. If you choose to use `MailHog`_ when generating the project a local SMTP server with a web interface will be available.
-
-.. _mailhog: https://github.com/mailhog/MailHog
 
 To start the service, make sure you have nodejs installed, and then type the following::
 
@@ -101,6 +81,7 @@ To view messages that are sent by your application, open your browser and go to 
 
 The email server will exit when you exit the Grunt task on the CLI with Ctrl+C.
 {% endif %}
+.. _mailhog: https://github.com/mailhog/MailHog
 {% endif %}
 {% if cookiecutter.use_sentry_for_error_reporting == "y" %}
 
@@ -117,15 +98,6 @@ Deployment
 ----------
 
 The following details how to deploy this application.
-{% if cookiecutter.use_heroku.lower() == "y" %}
-
-Heroku
-^^^^^^
-
-See detailed `cookiecutter-django Heroku documentation`_.
-
-.. _`cookiecutter-django Heroku documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-on-heroku.html
-{% endif %}
 {% if cookiecutter.use_docker.lower() == "y" %}
 
 Docker
@@ -135,13 +107,21 @@ See detailed `cookiecutter-django Docker documentation`_.
 
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
 {% endif %}
-{% if cookiecutter.use_elasticbeanstalk_experimental.lower() == 'y' %}
 
-Elastic Beanstalk
-~~~~~~~~~~~~~~~~~~
+{% if cookiecutter.custom_bootstrap_compilation == "y" %}
+Custom Bootstrap Compilation
+^^^^^^
 
-See detailed `cookiecutter-django Elastic Beanstalk documentation`_.
+The generated CSS is set up with automatic Bootstrap recompilation with variables of your choice.
+Bootstrap v4 is installed using npm and customised by tweaking your variables in ``static/sass/custom_bootstrap_vars``.
 
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-elastic-beanstalk.html
+You can find a list of available variables `in the bootstrap source`_, or get explanations on them in the `Bootstrap docs`_.
+
+{% if cookiecutter.js_task_runner == 'Gulp' %}
+Bootstrap's javascript as well as its dependencies is concatenated into a single file: ``static/js/vendors.js``.
+{% endif %}
+
+.. _in the bootstrap source: https://github.com/twbs/bootstrap/blob/v4-dev/scss/_variables.scss
+.. _Bootstrap docs: https://getbootstrap.com/docs/4.0/getting-started/theming/
 
 {% endif %}
