@@ -2,7 +2,6 @@ version: '2'
 
 volumes:
   postgres_data_local: {}
-  postgres_backup_local: {}
 
 services:
   django:
@@ -15,14 +14,11 @@ services:
       - .:/app
     ports:
       - "8000:8000"
-    command: /start.sh
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.local
+      - DATABASE_URL=postgres://postgres@postgres/django
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
+    image: postgres:{{ cookiecutter.postgresql_version }}
     volumes:
       - postgres_data_local:/var/lib/postgresql/data
-      - postgres_backup_local:/backups
-    env_file:
-      - ./.envs/.local/.postgres

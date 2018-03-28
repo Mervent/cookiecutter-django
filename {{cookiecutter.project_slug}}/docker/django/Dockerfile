@@ -1,15 +1,6 @@
-FROM python:3.6-alpine
+FROM python:3.6
 
 ENV PYTHONUNBUFFERED 1
-
-RUN apk update \
-  # psycopg2 dependencies
-  && apk add --virtual build-deps gcc python3-dev musl-dev \
-  && apk add postgresql-dev \
-  # Pillow dependencies
-  && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
-  # CFFI dependencies
-  && apk add libffi-dev openssl-dev py-cffi
 
 RUN addgroup -S django \
     && adduser -S -G django django
@@ -30,6 +21,9 @@ RUN chmod +x /entrypoint.sh
 RUN chown django /entrypoint.sh
 
 COPY . /app
+RUN mkdir /app/media \
+    && mkdir /app/static \
+    && chown -R django /app
 
 RUN chown -R django /app
 
