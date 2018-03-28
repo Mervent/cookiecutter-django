@@ -16,7 +16,7 @@ services:
   django:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
+      dockerfile: docker/django/Dockerfile
     user: django
     volumes:
       - media:/app/media
@@ -28,7 +28,7 @@ services:
     env_file: .env
 
   nginx:
-    build: ./compose/nginx
+    build: docker/nginx
     depends_on:
       - django
       - certbot
@@ -62,7 +62,7 @@ services:
     image: redis:latest
 
   backup:
-    build: ./compose/backup
+    build: docker/backup
     volumes:
       - backups:/backups
     volumes_from:
