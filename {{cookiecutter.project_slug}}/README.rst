@@ -11,6 +11,22 @@
 :License: {{cookiecutter.open_source_license}}
 {% endif %}
 
+Quick Deploy
+--------
+cp env.example .env
+nano -w .env
+# change postgres user and password
+# change sentry dsn
+# change django admin url
+
+openssl dhparam -out ./compose/nginx/dhparams.pem 2048
+
+# letsencrypt routines
+dc exec postgres createdb -U postgres django
+dc run --rm django python manage.py migrate
+dc run --rm django python manage.py createsuperuser
+
+
 Settings
 --------
 
