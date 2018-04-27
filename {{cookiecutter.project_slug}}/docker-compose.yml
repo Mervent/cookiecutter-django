@@ -8,12 +8,14 @@ volumes:
 
 services:
   postgres:
+    restart: unless-stopped
     image: postgres:{{ cookiecutter.postgresql_version }}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file: .env
 
   django:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/django/Dockerfile
@@ -28,6 +30,7 @@ services:
     env_file: .env
 
   nginx:
+    restart: unless-stopped
     build: docker/nginx
     depends_on:
       - django
@@ -59,6 +62,7 @@ services:
       - TERM=xterm
 
   redis:
+    restart: unless-stopped
     image: redis:latest
 
   backup:
