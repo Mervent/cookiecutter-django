@@ -7,7 +7,6 @@ COPY ./requirements /requirements
 RUN pip install -r /requirements/local.txt
 
 COPY ./docker/dev/django/start.sh /start.sh
-RUN sed -i 's/\r//' /start.sh
 RUN chmod +x /start.sh
 WORKDIR /app
 

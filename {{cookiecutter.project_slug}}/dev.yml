@@ -1,7 +1,9 @@
 version: '2'
 
 volumes:
-  postgres_data_local: {}
+  postgres_data: {}
+  backups: {}
+  media: {}
 
 services:
   django:
@@ -12,6 +14,7 @@ services:
       - postgres
     volumes:
       - .:/app
+      - media:/app/media
     ports:
       - "8000:8000"
     environment:
@@ -21,4 +24,14 @@ services:
   postgres:
     image: postgres:{{ cookiecutter.postgresql_version }}
     volumes:
-      - postgres_data_local:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+
+  backup:
+    build: ./docker/backup
+    volumes:
+      - backups:/backups
+    volumes_from:
+      - django
+    environment:
+      - POSTGRES_USER=postgres
+    command: /bin/true
